@@ -1,0 +1,50 @@
+name: Automated F-Droid Repo Builder
+
+on:
+  push:
+    branches:
+      - main # Triggers the build every time you push to the main branch
+
+permissions:
+  contents: write # Allows the bot to publish to your gh-pages branch
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Java Environment
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 3. Build the Android APK
+        # Note: This assumes a standard Gradle build. 
+        # If your Ai-mechanic app uses a different build system, we will tweak this.
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+
+      - name: 4. Install F-Droid Server
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fdroidserver
+
+      - name: 5. Generate F-Droid Repository
+        run: |
+          mkdir -p fdroid/repo
+          # Move the compiled APK into the F-Droid repo folder
+          find app/build/outputs/apk/ -name "*.apk" -exec cp {} fdroid/repo/ \;
+          cd fdroid
+          fdroid init
+          fdroid update -c # Scans the APK and builds the index-v1.jar / index-v2.json
+
+      - name: 6. Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./fdroid/repo
+          destination_dir: fdroid/repo # This creates the URL structure F-Droid expects
