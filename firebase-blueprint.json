@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "A vehicle in the fleet",
+      "type": "object",
+      "properties": {
+        "year": { "type": "number" },
+        "make": { "type": "string" },
+        "model": { "type": "string" },
+        "engine": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["year", "make", "model", "ownerId"]
+    },
+    "MaintenanceLog": {
+      "title": "Maintenance Log",
+      "description": "A service record for a vehicle",
+      "type": "object",
+      "properties": {
+        "vehicleId": { "type": "string" },
+        "service": { "type": "string" },
+        "mileage": { "type": "number" },
+        "cost": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["vehicleId", "service", "mileage", "date", "ownerId"]
+    },
+    "DiagnosticTicket": {
+      "title": "Diagnostic Ticket",
+      "description": "An AI-generated diagnostic report",
+      "type": "object",
+      "properties": {
+        "vehicleId": { "type": "string" },
+        "vehicleName": { "type": "string" },
+        "codes": { "type": "string" },
+        "notes": { "type": "string" },
+        "diagnosis": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["vehicleId", "diagnosis", "date", "ownerId"]
+    }
+  },
+  "firestore": {
+    "vehicles": {
+      "schema": "Vehicle",
+      "description": "Collection of vehicles"
+    },
+    "maintenance": {
+      "schema": "MaintenanceLog",
+      "description": "Collection of maintenance logs"
+    },
+    "tickets": {
+      "schema": "DiagnosticTicket",
+      "description": "Collection of diagnostic tickets"
+    }
+  }
+}
