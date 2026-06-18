@@ -135,36 +135,36 @@ Use plain text, no markdown bolding.`;
     model: "gemini-3-flash-preview",
     contents: [{ parts: [{ text: prompt }] }],
   });
-  
+
   return response.text || "No diagnosis generated.";
 };
 
 // --- PDF Generation ---
 const exportToPDF = (ticket: DiagnosticTicket) => {
   const doc = new jsPDF();
-  
+
   // Header
   doc.setFontSize(18);
   doc.setTextColor(77, 168, 218); // #4DA8DA
   doc.text('REPAIR SOL2 - DIAGNOSTIC SHOP TICKET', 105, 20, { align: 'center' });
-  
+
   doc.setDrawColor(0, 0, 0);
   doc.line(10, 25, 200, 25);
-  
+
   // Content
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text(`Date: ${format(ticket.date.toDate(), 'PPP')}`, 10, 35);
   doc.text(`Vehicle: ${ticket.vehicleName}`, 10, 45);
   doc.text(`DTCs/Symptoms: ${ticket.codes || 'None'}`, 10, 55);
-  
+
   doc.setFontSize(14);
   doc.text('Diagnosis & Test Path:', 10, 70);
-  
+
   doc.setFontSize(10);
   const splitText = doc.splitTextToSize(ticket.diagnosis, 180);
   doc.text(splitText, 10, 80);
-  
+
   doc.save(`Ticket_${ticket.vehicleName.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
 };
 
@@ -339,7 +339,7 @@ function AppContent() {
       if (!vehicle) throw new Error("Vehicle not found");
 
       const diagnosis = await generateDiagnosis(vehicle, diagForm.codes, diagForm.notes);
-      
+
       const ticketData = {
         vehicleId: vehicle.id,
         vehicleName: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
@@ -353,7 +353,7 @@ function AppContent() {
       const docRef = await addDoc(collection(db, path), ticketData);
       setDiagForm({ vehicleId: '', codes: '', notes: '' });
       setActiveTab('history');
-      
+
       // Auto-export the new ticket
       exportToPDF({ id: docRef.id, ...ticketData });
     } catch (err: any) {
